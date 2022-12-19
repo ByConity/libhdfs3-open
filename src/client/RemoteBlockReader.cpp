@@ -143,7 +143,7 @@ shared_ptr<Socket> RemoteBlockReader::getNextPeer(const DatanodeInfo& dn) {
             SCOPE_EXIT({
                 CNCH_HDFS_CALLBACK2(hdfs_event_callback, Event::HDFS_EVENT_DN_CONNECTION, int64_t(sw.elapsedNanoseconds()) );
             });
-            sock->connect(dn.getXferAddr().c_str(),dn.getXferPort(), connTimeout);
+            sock->connect(dn.getIpAddr().c_str(),dn.getXferPort(), connTimeout);
             sock->setNoDelay(true);
         }
     } catch (const HdfsTimeoutException & e) {

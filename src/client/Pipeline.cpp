@@ -622,7 +622,7 @@ void PipelineImpl::createBlockOutputStream(const Token & token, int64_t gs, bool
         sock = shared_ptr < Socket > (new TcpSocketImpl);
         reader = shared_ptr<BufferedSocketReader>(new BufferedSocketReaderImpl(*sock));
 
-        sock->connect(nodes[0].getXferAddr().c_str(), nodes[0].getXferPort() ,  connectTimeout);
+        sock->connect(nodes[0].getIpAddr().c_str(), nodes[0].getXferPort() ,  connectTimeout);
         std::vector<DatanodeInfo> targets;
 
         for (size_t i = 1; i < nodes.size(); ++i) {

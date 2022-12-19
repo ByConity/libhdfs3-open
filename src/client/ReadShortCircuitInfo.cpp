@@ -150,8 +150,8 @@ BlockLocalPathInfo ReadShortCircuitInfoBuilder::getBlockLocalPathInfo(
        * only kerberos based authentication is allowed, do not add
        * token
        */
-      shared_ptr<Datanode> dn = shared_ptr < Datanode > (new DatanodeImpl(dnInfo.getXferAddr(),
-                                    dnInfo.getXferPort(), c, a));
+      shared_ptr<Datanode> dn = shared_ptr < Datanode > (new DatanodeImpl(dnInfo.getIpAddr(),
+                                    dnInfo.getIpcPort(), c, a));
       dn->getBlockLocalPathInfo(block, token, retval);
 
       BlockLocalPathInfoCache.setMaxSize(conf.getMaxLocalBlockInfoCacheSize());

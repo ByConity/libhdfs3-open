@@ -203,8 +203,8 @@ int64_t InputStreamImpl::readBlockLength(const LocatedBlock & b) {
             }
 
 #else
-            dn = shared_ptr < Datanode > (new DatanodeImpl(nodes[i].getXferAddr(),
-                                          nodes[i].getXferPort(), *conf, a));
+            dn = shared_ptr < Datanode > (new DatanodeImpl(nodes[i].getIpAddr(),
+                                          nodes[i].getIpcPort(), *conf, a));
 #endif
             n = dn->getReplicaVisibleLength(b);
 

@@ -257,7 +257,7 @@ namespace Internal
                 }
                 else
                 {
-                    tcp::endpoint endpoint(address::from_string(datanode.getXferAddr()), datanode.getXferPort());
+                    tcp::endpoint endpoint(address::from_string(datanode.getIpAddr()), datanode.getIpcPort());
                     tcpStream = std::make_shared<boost::beast::tcp_stream>(
                         bnet::make_strand(Hdfs::Internal::AsyncCb::AsioGlobalContext::Instance()));
                     tcpStream->expires_after(std::chrono::milliseconds(conf->getRpcConnectTimeout()));

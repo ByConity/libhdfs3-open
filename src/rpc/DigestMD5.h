@@ -1,3 +1,9 @@
+
+/*
+ * This file may have been modified by ByteDance Ltd. (“ Bytedance's Modifications”).
+ * All Bytedance's Modifications are Copyright (2023) ByteDance Ltd..
+ */
+
 #ifndef _HDFS_LIBHDFS3_RPC_DIGESTMD5_H_
 #define _HDFS_LIBHDFS3_RPC_DIGESTMD5_H_
 

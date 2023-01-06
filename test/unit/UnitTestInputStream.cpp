@@ -206,11 +206,11 @@ TEST(InputStreamTest, ChoseBestNode_Success) {
 TEST(InputStreamTest, SetupBlockReader_Failed) {
     InputStreamImpl ins;
     LocatedBlock * lb = new LocatedBlock();
-    std::vector<DatanodeInfo> dfv;
+    std::set<DatanodeInfo> dfv;
     DatanodeInfo df1;
     DatanodeInfo df2;
-    dfv.push_back(df1);
-    dfv.push_back(df2);
+    dfv.emplace(df1);
+    dfv.emplace(df2);
     lb->locs = dfv;
     ins.curBlock = shared_ptr < LocatedBlock > (lb);
     ins.failedNodes = dfv;

@@ -87,7 +87,7 @@ SessionConfig::SessionConfig(const Config & conf) {
         }, {
             &badNodeStore, "input.badnodestore.use", true
         }, {
-            &fastSwitchRead, "input.fastswitchread.use", true
+            &fastSwitchRead, "input.fastswitchread.use", false 
         }, {
             &encryptedDatanode, "dfs.encrypt.data.transfer", false
         }, {
@@ -97,7 +97,7 @@ SessionConfig::SessionConfig(const Config & conf) {
         }, {
             &useInternalCredentialFormat, "dfs.use.internal.credential.format", true
         }, {
-            &enableFastSwitchRead, "dfs.client.switch.read.enable", true
+            &enableFastSwitchRead, "dfs.client.switch.read.enable", false 
         }, {
             &enableInternalMetrics, "dfs.client.metrics.enable", false
         },{

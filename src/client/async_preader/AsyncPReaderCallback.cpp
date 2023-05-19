@@ -257,7 +257,7 @@ namespace Internal
                 }
                 else
                 {
-                    tcp::endpoint endpoint(address::from_string(datanode.getIpAddr()), datanode.getIpcPort());
+                    tcp::endpoint endpoint(address::from_string(datanode.getIpAddr()), datanode.getXferPort());
                     tcpStream = std::make_shared<boost::beast::tcp_stream>(
                         bnet::make_strand(Hdfs::Internal::AsyncCb::AsioGlobalContext::Instance()));
                     tcpStream->expires_after(std::chrono::milliseconds(conf->getRpcConnectTimeout()));
@@ -281,13 +281,9 @@ namespace Internal
                 auto self = shared_from_this();
                 CheckProcessing(readContext);
                 error_code ec;
-                WriteBuffer wb;
-                ProtocolUtil::composeReadBlockHeader(*binfo, token, clientName.c_str(), start, len, &wb);
-                std::string rawdata;
-                int size = wb.getDataSize(0);
-                rawdata.resize(size);
-                memcpy(&rawdata[0], wb.getBuffer(0), size);
-                auto buf = boost::asio::buffer(rawdata, size);
+                ProtocolUtil::composeReadBlockHeader(*binfo, token, clientName.c_str(), start, len, &sendReadRawDataBuffer);
+                int size = sendReadRawDataBuffer.getDataSize(0);
+                auto buf = boost::asio::buffer(sendReadRawDataBuffer.getBuffer(0), size);
                 tcpStream->expires_after(std::chrono::milliseconds(conf->getInputWriteTimeout()));
                 bnet::async_write(*tcpStream, buf, [this, self, size](error_code ec, size_t length) {
                     CheckEc(ec);
@@ -668,14 +664,13 @@ namespace Internal
                     status.set_status(Status::DT_PROTO_SUCCESS);
                 }
 
-                WriteBuffer buffer;
                 int size = status.ByteSize();
-                buffer.writeVarint32(size);
-                status.SerializeToArray(buffer.alloc(size), size);
+                sendStatusRawDataBuffer.writeVarint32(size);
+                status.SerializeToArray(sendStatusRawDataBuffer.alloc(size), size);
                 tcpStream->expires_after(std::chrono::milliseconds(conf->getInputWriteTimeout()));
                 bnet::async_write(
                     *tcpStream,
-                    boost::asio::buffer(buffer.getBuffer(0), buffer.getDataSize(0)),
+                    boost::asio::buffer(sendStatusRawDataBuffer.getBuffer(0), sendStatusRawDataBuffer.getDataSize(0)),
                     [this, self](error_code ec, size_t length) {
                         tcpStream->expires_never();
                         sentStatus = true;

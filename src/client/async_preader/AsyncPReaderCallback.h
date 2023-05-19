@@ -233,6 +233,10 @@ namespace Internal
             std::unique_ptr<boost::asio::steady_timer> delayTimer = nullptr;
 
             int packetCount = 0;
+            
+            // boost::asio::buffer is a shallow copy we need hold raw data
+            WriteBuffer sendReadRawDataBuffer;
+            WriteBuffer sendStatusRawDataBuffer;
         };
     }
 }

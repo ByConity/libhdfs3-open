@@ -29,7 +29,9 @@
 #include "Exception.h"
 #include "ExceptionInternal.h"
 #include "FileSystemInter.h"
+#if defined(__X86__)
 #include "HWCrc32c.h"
+#endif
 #include "LeaseRenewer.h"
 #include "Logger.h"
 #include "OutputStream.h"
@@ -49,11 +51,15 @@ OutputStreamImpl::OutputStreamImpl() :
         0), chunksPerPacket(0), closeTimeout(0), heartBeatInterval(0), packetSize(0), position(
             0), replication(0), blockSize(0), bytesWritten(0), cursor(0), lastFlushed(
                 0), nextSeqNo(0), packets(0), cryptoCodec(NULL), kcp(NULL) {
+    #if defined(__X86__)
     if (HWCrc32c::available()) {
         checksum = shared_ptr < Checksum > (new HWCrc32c());
     } else {
         checksum = shared_ptr < Checksum > (new SWCrc32c());
     }
+    #else
+    checksum = shared_ptr < Checksum > (new SWCrc32c());
+    #endif
 
     checksumSize = sizeof(int32_t);
     lastSend = steady_clock::now();

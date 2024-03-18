@@ -428,7 +428,6 @@ namespace Internal
 
                     case ChecksumTypeProto::CHECKSUM_CRC32:
                     case ChecksumTypeProto::CHECKSUM_CRC32C:
-                        #if defined(__X86__)
                         if (HWCrc32c::available())
                         {
                             checksum = shared_ptr<Checksum>(new HWCrc32c());
@@ -437,9 +436,6 @@ namespace Internal
                         {
                             checksum = shared_ptr<Checksum>(new SWCrc32c());
                         }
-                        #else
-                             checksum = shared_ptr<Checksum>(new SWCrc32c());
-                        #endif
 
                         checksumSize = sizeof(int32_t);
                         break;

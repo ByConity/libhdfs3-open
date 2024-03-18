@@ -29,9 +29,7 @@
 #include "Exception.h"
 #include "ExceptionInternal.h"
 #include "Metrics.h"
-#if defined(__X86__)
 #include "HWCrc32c.h"
-#endif
 #include "RemoteBlockReader.h"
 #include "SWCrc32c.h"
 #include "WriteBuffer.h"
@@ -215,15 +213,11 @@ void RemoteBlockReader::checkResponse() {
 
     case ChecksumTypeProto::CHECKSUM_CRC32:
     case ChecksumTypeProto::CHECKSUM_CRC32C:
-	#if defined(__X86__)
         if (HWCrc32c::available()) {
             checksum = shared_ptr<Checksum>(new HWCrc32c());
         } else {
             checksum = shared_ptr<Checksum>(new SWCrc32c());
         }
-        #else
-            checksum = shared_ptr < Checksum > (new SWCrc32c());
-        #endif
 
         checksumSize = sizeof(int32_t);
         break;

@@ -84,15 +84,11 @@ LocalBlockReader::LocalBlockReader(const shared_ptr<ReadShortCircuitInfo>& info,
 
         case ChecksumTypeProto::CHECKSUM_CRC32:
         case ChecksumTypeProto::CHECKSUM_CRC32C:
-            #if !defined(__X86__)
-             checksum = shared_ptr<Checksum>(new SWCrc32c());
-        #else
             if (HWCrc32c::available()) {
                 checksum = shared_ptr<Checksum>(new HWCrc32c());
             } else {
                 checksum = shared_ptr<Checksum>(new SWCrc32c());
             }
-        #endif
 
             chunkSize = ReadBigEndian32FromArray(
                             &pMetaBuffer[BMVERSION_SIZE + CHECKSUM_TYPE_SIZE]);

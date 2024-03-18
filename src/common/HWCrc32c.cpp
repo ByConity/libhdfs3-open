@@ -70,6 +70,10 @@ static inline uint32_t _mm_crc32_u8(uint32_t crc, uint8_t value) {
 
 #endif
 
+#elif ((defined(__arm__) || defined(__aarch64__)))
+#include "sse2neon.h"
+#endif
+
 namespace Hdfs {
 namespace Internal {
 
@@ -82,6 +86,8 @@ bool HWCrc32c::available() {
      */
     __get_cpuid(1, &eax, &ebx, &ecx, &edx);
     return (ecx & (1 << 20)) != 0;
+#elif ((defined(__arm__) || defined(__aarch64__)))
+    return true;   
 #else
     return false;
 #endif
@@ -160,5 +166,3 @@ void HWCrc32c::updateInt64(const char * b, int len) {
 
 }
 }
-
-#endif /* _HDFS_LIBHDFS3_COMMON_HWCHECKSUM_H_ */

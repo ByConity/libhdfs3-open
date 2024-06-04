@@ -17,7 +17,7 @@
 // Created by Renming Qi on 22/3/22.
 //
 #include <sys/prctl.h>
-
+#include <string>
 #include "client/PeerCache.h"
 #include "client/async_preader/AsyncPReaderCallback.h"
 
@@ -32,9 +32,10 @@ namespace Internal
 {
     namespace AsyncCb
     {
+        static boost::asio::io_context io_context;
         boost::asio::io_context & AsioGlobalContext::Instance()
         {
-            static boost::asio::io_context io_context;
+            static AsioGlobalContext globalContextInitializer;
             return io_context;
         }
 
@@ -48,14 +49,14 @@ namespace Internal
                 threads.emplace_back([&] {
                     std::string threadName = "hedge-read-" + std::to_string(i);
                     prctl(PR_SET_NAME,threadName.c_str(),0,0,0);
-                    auto work = boost::asio::require(Instance().get_executor(), boost::asio::execution::outstanding_work.tracked);
-                    Instance().run();
+                    auto work = boost::asio::require(io_context.get_executor(), boost::asio::execution::outstanding_work.tracked);
+                    io_context.run();
                 });
             }
         }
         AsioGlobalContext::~AsioGlobalContext()
         {
-            Instance().stop();
+            io_context.stop();
             for (auto & th : threads)
             {
                 if (th.joinable())
@@ -65,9 +66,7 @@ namespace Internal
             }
         }
 
-        static AsioGlobalContext globalContextInitializer;
     }
-
 
     LruMultiMap<std::string, PeerCache::value_type> PeerCache::Map;
     LruMultiMap<std::string, PeerCache::value_type_async> PeerCache::MapAsync;

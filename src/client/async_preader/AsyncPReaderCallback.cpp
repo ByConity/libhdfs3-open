@@ -26,6 +26,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <google/protobuf/io/coded_stream.h>
 #include "Logger.h"
+#include "AsioGlobalContext.h"
 #include "client/DataTransferProtocolSender.h"
 #include "client/Metrics.h"
 namespace Hdfs
@@ -34,6 +35,9 @@ namespace Internal
 {
     namespace AsyncCb
     {
+
+    namespace bnet = boost::beast::net;
+
 #define bodyBufferConsume(consumed) \
     { \
         bodyBuffer.consume(consumed); \
@@ -132,6 +136,7 @@ namespace Internal
             memcpy(this->buf + dstOffset, src, len);
         }
 
+        std::once_flag setMapSizeOnce;
         AsyncPReaderV2::AsyncPReaderV2(
             std::shared_ptr<FileSystemInter> filesystem,
             std::shared_ptr<LocatedBlock> eb,
@@ -163,7 +168,10 @@ namespace Internal
             , conf(conf)
 
         {
-            //            bodyBufferSize = std::max((int64_t)(128 * 1024), std::max((int64_t)(PacketHeader::GetPkgHeaderSize()), len));
+            std::call_once(setMapSizeOnce, [&]
+            {
+                AsioGlobalContext::Instance().getAsyncSocketMap().setMaxSize(conf->getSocketCacheCapacity());
+            });
         }
 
         AsyncPReaderV2::~AsyncPReaderV2()
@@ -259,7 +267,7 @@ namespace Internal
                 {
                     tcp::endpoint endpoint(address::from_string(datanode.getIpAddr()), datanode.getXferPort());
                     tcpStream = std::make_shared<boost::beast::tcp_stream>(
-                        bnet::make_strand(Hdfs::Internal::AsyncCb::AsioGlobalContext::Instance()));
+                        bnet::make_strand(Hdfs::Internal::AsyncCb::AsioGlobalContext::Instance().getIOContext()));
                     tcpStream->expires_after(std::chrono::milliseconds(conf->getRpcConnectTimeout()));
                     tcpStream->async_connect(endpoint, [this, self](error_code ec) {
                         CheckEc(ec);
@@ -686,7 +694,7 @@ namespace Internal
             if (delayMills)
             {
                 delayTimer = std::make_unique<boost::asio::steady_timer>(
-                    Hdfs::Internal::AsyncCb::AsioGlobalContext::Instance(), std::chrono::milliseconds(mill));
+                    Hdfs::Internal::AsyncCb::AsioGlobalContext::Instance().getIOContext(), std::chrono::milliseconds(mill));
             }
         }
 

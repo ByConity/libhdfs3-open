@@ -47,6 +47,7 @@
 #include "common/SessionConfig.h"
 #include "network/Socket.h"
 #include "server/DatanodeInfo.h"
+#include "client/async_preader/AsioGlobalContext.h"
 namespace Hdfs
 {
 namespace Internal
@@ -109,7 +110,7 @@ namespace Internal
         {
             if constexpr (std::is_same<boost::beast::tcp_stream, SocketType>::value)
             {
-                return MapAsync;
+                return AsyncCb::AsioGlobalContext::Instance().getAsyncSocketMap();
             }
             else
             {
@@ -117,12 +118,11 @@ namespace Internal
             }
         }
 
+
     private:
         const int cacheSize;
         int64_t expireTimeInterval; // milliseconds
         static LruMultiMap<std::string, value_type> Map; // this map is storing normal linux socket.
-        static LruMultiMap<std::string, value_type_async>
-            MapAsync; // this map is storing boost::asio::tcp_stream, which is a boost wrapper over socket.
     };
 }
 }

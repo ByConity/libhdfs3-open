@@ -19,8 +19,8 @@
 #ifndef CLICKHOUSE_AsyncPReaderV2CALLBACK_H
 #define CLICKHOUSE_AsyncPReaderV2CALLBACK_H
 #include <memory>
-#include <tuple>
 #include <boost/asio.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/spawn.hpp>
 #include <boost/beast.hpp>
@@ -50,7 +50,6 @@ namespace Internal
         using namespace boost::asio::ip;
         using boost::asio::ip::tcp;
         using boost::system::error_code;
-        namespace bnet = boost::beast::net;
         using boost::beast::flat_buffer;
 
 
@@ -116,17 +115,7 @@ namespace Internal
             bool isReadNeedProcessing() { return sessionStatus.load() == AsyncPReadSessionStatus::Processing; }
         };
 
-        /*
-         * AsioGlobalContext is the io_context of boost asio, which is responsible for scheduling and executing async tasks.
-         */
-        class AsioGlobalContext
-        {
-        public:
-            AsioGlobalContext();
-            ~AsioGlobalContext();
-            std::vector<std::thread> threads;
-            static boost::asio::io_context & Instance();
-        };
+      
         /*
          * This class is used to read data from one datanode in an async way using boost asio's ability.
          * Simply speaking, in asio, our program uses I/O objects (e.g., socket, async timer). The request to I/O object

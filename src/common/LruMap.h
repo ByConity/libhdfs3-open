@@ -163,6 +163,11 @@ public:
 
     ~LruMultiMap()
     {
+        clear();
+    }
+
+    void clear()
+    {
         lock_guard<mutex> lock(mut);
         map.clear();
         list.clear();

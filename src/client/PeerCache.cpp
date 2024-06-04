@@ -32,11 +32,12 @@ namespace Hdfs {
 namespace Internal
 {
 
-PeerCache::PeerCache(const SessionConfig & conf)
+    LruMultiMap<std::string, PeerCache::value_type> PeerCache::Map;
+
+    PeerCache::PeerCache(const SessionConfig & conf)
         : cacheSize(conf.getSocketCacheCapacity()), expireTimeInterval(conf.getSocketCacheExpiry())
     {
         Map.setMaxSize(cacheSize);
-        MapAsync.setMaxSize(cacheSize);
     }
 
     std::string PeerCache::buildKey(const DatanodeInfo & datanode)

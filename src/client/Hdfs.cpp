@@ -698,7 +698,7 @@ hdfsFile hdfsOpenFile(hdfsFS fs, const char * path, int flags, int bufferSize,
 
             file->setInput(false);
             os = new OutputStream;
-            os->open(fs->getFilesystem(), path, internalFlags, 0777, false, replication,
+            os->open(fs->getFilesystem(), path, internalFlags, 0777, true, replication,
                      blocksize);
             file->setStream(os);
         } else {
